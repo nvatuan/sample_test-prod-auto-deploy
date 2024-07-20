@@ -1,0 +1,25 @@
+name: Create PR - Promote to `prod` from `main`
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create_pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: prod
+          title: Promote to `prod` from commit `main@${{ github.sha }}`
+          body: |
+            This pull request is automatically generated to merge changes from the main branch to the prod branch.
+            Please review the content.
+          commit-message: Promote to `prod` from commit `main@${{ github.sha }}`
