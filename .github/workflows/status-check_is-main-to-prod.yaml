@@ -35,5 +35,6 @@ jobs:
         with:
           header: remind-wrong-branch
           message: |
-            :warning: **FAIL** PR merging to `prod` must be from `main` branch.
+            # 🚫 PULL REQUEST MERGE TO `prod` MUST BE FROM `main`
+
             Please add your change in the `main` branch and open a new PR to `prod`.
