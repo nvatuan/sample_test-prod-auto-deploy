@@ -1,0 +1,39 @@
+name: Status Check - PR to `prod` must from `main`
+
+on:
+  pull_request:
+    branches:
+      - prod
+    types:
+      - opened
+      - synchronize
+      - reopened
+      
+permissions:
+  pull-requests: write
+
+jobs:
+  status_check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check PR branch from `main`
+        run: |
+          if [[ "${{ github.event.pull_request.head.ref }}" == "main" ]]; then
+            echo "OK: PR head branch is 'main'"
+            exit 0
+          fi
+          echo "ERR: PR head branch is not 'main'"
+          exit 1
+      
+      - name: Write comment if PR head branch is not `main`
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: failure()
+        with:
+          header: remind-wrong-branch
+          message: |
+            :warning: **FAIL** PR merging to `prod` must be from `main` branch.
+            Please add your change in the `main` branch and open a new PR to `prod`.
