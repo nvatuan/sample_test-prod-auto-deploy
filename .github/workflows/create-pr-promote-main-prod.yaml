@@ -18,6 +18,7 @@ jobs:
         with:
           token: ${{ secrets.BOT_TOKEN }}
           branch: prod
+          base: main
           title: Promote to `prod` from commit `main@${{ github.sha }}`
           body: |
             This pull request is automatically generated to merge changes from the main branch to the prod branch.
