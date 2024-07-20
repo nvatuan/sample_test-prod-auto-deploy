@@ -13,7 +13,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  status_check:
+  stschk_merge-from-main-to-prod:
     runs-on: ubuntu-latest
 
     steps:
