@@ -16,7 +16,10 @@ jobs:
       - name: Promote 'main' to 'prod'
         id: promote
         run: |
-          gh pr create --base prod --head main --title "Auto promote 'main' to 'prod'" --fill > pr-url.txt 2> stderr.txt || true
+          git checkout main
+          git fetch origin main
+          git pull
+          gh pr create --base prod --head main --title "AUTO PR: Promote 'main' to 'prod'" --fill > stdout.txt 2> stderr.txt || true
           if [ -s stderr.txt ]; then
             echo "PR already exists:"
             cat stderr.txt | tail -n 1
@@ -24,7 +27,7 @@ jobs:
           fi
           if [ -s pr-url.txt ]; then
             echo "PR created:"
-            cat pr-url.txt
+            cat stdout.txt
             exit 0
           fi
           exit 1

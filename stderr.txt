@@ -1,3 +1,0 @@
-Warning: 2 uncommitted changes
-a pull request for branch "main" into branch "prod" already exists:
-https://github.com/nvatuan/sample_test-prod-auto-deploy/pull/15
