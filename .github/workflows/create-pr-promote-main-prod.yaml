@@ -22,6 +22,7 @@ jobs:
           git fetch origin main
           git pull
           gh pr create --base prod --head main --title "AUTO PR: Promote 'main' to 'prod'" --label auto-promote --fill > stdout.txt 2> stderr.txt || true
+          
           if [ -s pr-url.txt ]; then
             echo "PR created:"
             cat stdout.txt
