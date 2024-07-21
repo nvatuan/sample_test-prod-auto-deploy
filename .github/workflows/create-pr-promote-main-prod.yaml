@@ -8,6 +8,7 @@ on:
 jobs:
   create_pr:
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
       - name: Checkout code
@@ -21,8 +22,13 @@ jobs:
           git checkout main
           git fetch origin main
           git pull
-          gh pr create --base prod --head main --title "AUTO PR: Promote 'main' to 'prod'" --label auto-promote --fill > stdout.txt 2> stderr.txt || true
-          
+          git reset --hard origin/main
+
+          set -e
+          gh pr create --base prod --head main --title "AUTO PR: Promote 'main' to 'prod'" --label auto-promote --fill > stdout.txt 2> stderr.txt
+          errcode=$?
+          set +e
+
           if [ -s pr-url.txt ]; then
             echo "PR created:"
             cat stdout.txt
@@ -34,8 +40,7 @@ jobs:
               echo "PR already exists: $lastmsg"
               exit 0
             fi
-            echo "There was an error when creating PR:"
-            cat stderr.txt
-            exit 1
+            echo stderr.txt
+            exit $errcode
           fi
           exit 1
