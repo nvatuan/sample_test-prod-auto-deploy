@@ -81,12 +81,14 @@ jobs:
               break
             fi
           done
+          echo "Output safe_to_merge: $safe_to_merge"
+          echo "safe_to_merge=$safe_to_merge" >> $GITHUB_OUTPUT
     
       - name: Approve and merge if they are safe to merge
         id: approve-merge
         if: steps.detect-safe-changes.outputs.safe_to_merge == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          gh_token: ${{ secrets.github_token }}
         run: |
           echo "OK: Safe to merge"
           gh pr merge ${{ github.event.number }} --auto --merge
@@ -94,8 +96,6 @@ jobs:
       - name: Add comments if need approval
         id: comment-if-need-approval
         if: steps.detect-safe-changes.outputs.safe_to_merge == 'false'
-        env:
-          unsafe_changes: ${{ steps.detect-safe-changes.outputs.unsafe_changes }}
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: remind-approval
@@ -105,15 +105,13 @@ jobs:
             This PR contains unsafe changes. Please review the changes and approve the merge manually.
             Found unsafe changes:
             ```
-            test 123
+            ${{ steps.detect-safe-changes.outputs.unsafe_changes }}
             ```
-
-      - name: Status Check auto merge
-        id: status-check
+      
+      - name: Add reviewers if need approval
+        id: assign-if-need-approval
+        if: steps.detect-safe-changes.outputs.safe_to_merge == 'false'
         env:
-          safe_to_merge: ${{ steps.detect-safe-changes.outputs.safe_to_merge }}
+          GH_TOKEN: ${{ secrets.github_token }}
         run: |
-          if [[ $safe_to_merge == true ]]; then 
-            exit 0
-          fi
-          exit 1
+          gh pr edit ${{ github.event.number }} --add-reviewer nvatuan
