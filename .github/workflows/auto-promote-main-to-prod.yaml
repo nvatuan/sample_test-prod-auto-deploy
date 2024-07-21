@@ -96,8 +96,6 @@ jobs:
       - name: Add comments if need approval
         id: comment-if-need-approval
         if: steps.detect-safe-changes.outputs.safe_to_merge == 'false'
-        env:
-          unsafe_changes: ${{ steps.detect-safe-changes.outputs.unsafe_changes }}
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: remind-approval
@@ -107,13 +105,13 @@ jobs:
             This PR contains unsafe changes. Please review the changes and approve the merge manually.
             Found unsafe changes:
             ```
-            * $unsafe_changes
+            * ${{ steps.detect-safe-changes.outputs.unsafe_changes }}
             ```
       
       - name: Add reviewers if need approval
         id: assign-if-need-approval
         if: steps.detect-safe-changes.outputs.safe_to_merge == 'false'
         env:
-          gh_token: ${{ secrets.github_token }}
+          GH_TOKEN: ${{ secrets.github_token }}
         run: |
-          gh pr edit ${{ github.event.number }} --add-reviewer ${{ github.actor }}
+          gh pr edit ${{ github.event.number }} --add-reviewer @nvatuan
