@@ -13,19 +13,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Reset promotion branch
+      - name: Promote `main` to `prod`
+        id: promote
         run: |
-          git fetch
-          git pull
-          git reset --hard main
-
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.BOT_TOKEN }}
-          branch: prod
-          title: Promote to `prod` from commit `main@${{ github.sha }}`
-          body: |
-            This pull request is automatically generated to merge changes from the main branch to the prod branch.
-            Please review the content.
-          commit-message: Promote to `prod` from commit `main@${{ github.sha }}`
+          gh pr create --base prod --head main --title "Auto promote `main` to `prod`" --fill > pr-url.txt 2> stderr.txt
+          if [ -s stderr.txt ]; then
+            cat stderr.txt
+            exit 0
+          fi
+          if [ -s pr-url.txt ]; then
+            echo "PR created:"
+            cat pr-url.txt
+            exit 0
+          fi
+          exit 1
