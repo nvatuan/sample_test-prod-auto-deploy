@@ -37,7 +37,7 @@ jobs:
               echo "PR already exists: $lastmsg"
               exit 0
             fi
-            echo stderr.txt
+            cat stderr.txt
             exit $errcode
           fi
           exit 1
