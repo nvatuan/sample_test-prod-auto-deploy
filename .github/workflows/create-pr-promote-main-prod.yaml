@@ -19,6 +19,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.BOT_TOKEN }}
         run: |
+          git fetch origin main
+          git pull
           git reset --hard origin/main
 
           set +e
