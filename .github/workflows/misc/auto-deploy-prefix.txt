@@ -1,4 +1,4 @@
 README.md
 safe-to-auto-deploy.yaml
 safe-to-auto-deploy/
-.github/workflows
+.github/workflows/
