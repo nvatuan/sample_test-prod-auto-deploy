@@ -16,12 +16,12 @@ jobs:
       - name: Promote 'main' to 'prod'
         id: promote
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.BOT_TOKEN }}
         run: |
           git checkout main
           git fetch origin main
           git pull
-          # gh pr create --base prod --head main --title "AUTO PR: Promote 'main' to 'prod'" --fill > stdout.txt 2> stderr.txt || true
+          # gh pr create --base prod --head main --title "AUTO PR: Promote 'main' to 'prod'" --fill > stdout.txt 2> stderr.txt
           gh pr create --base prod --head main --title "AUTO PR: Promote 'main' to 'prod'" --fill
           if [ -s stderr.txt ]; then
             echo "PR already exists:"
@@ -34,4 +34,3 @@ jobs:
             exit 0
           fi
           exit 1
-
