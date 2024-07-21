@@ -1,0 +1,3 @@
+README.md
+safe-to-auto-deploy.yaml
+safe-to-auto-deploy/

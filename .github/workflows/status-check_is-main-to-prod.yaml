@@ -1,4 +1,4 @@
-name: Status Check - PR to `prod` must from `main`
+name: Check auto deploy PR from `main` to `prod`
 
 on:
   pull_request:
@@ -39,3 +39,52 @@ jobs:
             # 🚫 PULL REQUEST MERGE TO `prod` MUST BE FROM `main`
 
             Please add your change in the `main` branch and open a new PR to `prod`.
+
+  auto-promote-to-prod:
+    runs-on: ubuntu-latest
+    needs: stschk_merge-from-main-to-prod
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect file changes
+        id: detect-safe-changes
+        run: |
+          git diff --name-only origin/prod...HEAD > changed-files.txt
+          echo "Changed files:"
+          cat changed-files.txt
+          
+          safe_to_merge=true
+          for file in $(cat changed-files.txt); do
+            safe_change=false
+            echo "FILE: $file"
+            for safe_prefix in $(cat .github/workflows/misc/auto-deploy-prefix.txt); do
+              echo "-- Prefix: $safe_prefix"
+              if [[ $file == $safe_prefix* ]]; then
+                safe_change=true
+                break
+              fi
+            done
+
+            if [[ $safe_change == false ]]; then
+              safe_to_merge=false
+              break
+            fi
+          done
+
+          echo "safe_to_merge=$safe_to_merge" >> $GITHUB_OUTPUT
+    
+      - name: Approve and merge if they are safe to merge
+        id: approve-merge
+        run: |
+          if [[ "${{ steps.detect-safe-changes.outputs.safe_to_merge }}" == "true" ]]; then
+            echo "OK: Safe to merge"
+            gh pr merge ${{ github.event.number }} --auto
+            exit 0
+          fi
+          echo "ERR: Not safe to merge"
+          exit 1
+ 

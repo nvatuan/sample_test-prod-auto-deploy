@@ -17,7 +17,7 @@ jobs:
       - name: Promote 'main' to 'prod'
         id: promote
         env:
-          GH_TOKEN: ${{ secrets.BOT_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git checkout main
           git fetch origin main
