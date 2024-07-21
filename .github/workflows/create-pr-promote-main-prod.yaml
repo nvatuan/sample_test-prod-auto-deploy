@@ -22,14 +22,19 @@ jobs:
           git fetch origin main
           git pull
           gh pr create --base prod --head main --title "AUTO PR: Promote 'main' to 'prod'" --label auto-promote --fill > stdout.txt 2> stderr.txt || true
-          if [ -s stderr.txt ]; then
-            echo "PR already exists:"
-            cat stderr.txt | tail -n 1
-            exit 0
-          fi
           if [ -s pr-url.txt ]; then
             echo "PR created:"
             cat stdout.txt
             exit 0
+          fi
+          if [ -s stderr.txt ]; then
+            lastmsg=$(cat stderr.txt | tail -n 1)
+            if [[ $lastmsg == *"https://github.com/"* ]]; then
+              echo "PR already exists: $lastmsg"
+              exit 0
+            fi
+            echo "There was an error when creating PR:"
+            cat stderr.txt
+            exit 1
           fi
           exit 1
