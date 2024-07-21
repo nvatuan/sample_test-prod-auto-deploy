@@ -75,6 +75,7 @@ jobs:
 
             if [[ $safe_change == false ]]; then
               safe_to_merge=false
+              echo "unsafe_changes=$file" >> $GITHUB_OUTPUT
               break
             fi
           done
@@ -83,14 +84,22 @@ jobs:
     
       - name: Approve and merge if they are safe to merge
         id: approve-merge
+        if: steps.detect-safe-changes.outputs.safe_to_merge == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [[ "${{ steps.detect-safe-changes.outputs.safe_to_merge }}" == "true" ]]; then
-            echo "OK: Safe to merge"
-            gh pr merge ${{ github.event.number }} --auto
-            exit 0
-          fi
-          echo "ERR: Not safe to merge"
-          exit 1
- 
+          echo "OK: Safe to merge"
+          gh pr merge ${{ github.event.number }} --auto
+      
+      - name: Add comments if need approval
+        id: comment-if-need-approval
+        if: steps.detect-safe-changes.outputs.safe_to_merge == 'false'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: remind-approval
+          delete: true
+          message: |
+            ## :warning: Needs Manual Approval and Merge
+
+            This PR contains unsafe changes. Please review the changes and approve the merge manually.
+            Changes: ${{ steps.detect-safe-changes.outputs.unsafe_changes }}
