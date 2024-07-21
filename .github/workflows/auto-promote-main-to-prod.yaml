@@ -81,8 +81,6 @@ jobs:
               break
             fi
           done
-
-          echo "safe_to_merge=$safe_to_merge" >> $GITHUB_OUTPUT
     
       - name: Approve and merge if they are safe to merge
         id: approve-merge
@@ -96,12 +94,26 @@ jobs:
       - name: Add comments if need approval
         id: comment-if-need-approval
         if: steps.detect-safe-changes.outputs.safe_to_merge == 'false'
+        env:
+          unsafe_changes: ${{ steps.detect-safe-changes.outputs.unsafe_changes }}
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: remind-approval
-          delete: true
           message: |
             ## :warning: Needs Manual Approval and Merge
 
             This PR contains unsafe changes. Please review the changes and approve the merge manually.
-            Changes: ${{ steps.detect-safe-changes.outputs.unsafe_changes }}
+            Found unsafe changes:
+            ```
+            test 123
+            ```
+
+      - name: Status Check auto merge
+        id: status-check
+        env:
+          safe_to_merge: ${{ steps.detect-safe-changes.outputs.safe_to_merge }}
+        run: |
+          if [[ $safe_to_merge == true ]]; then 
+            exit 0
+          fi
+          exit 1
