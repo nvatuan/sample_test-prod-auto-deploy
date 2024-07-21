@@ -81,6 +81,8 @@ jobs:
               break
             fi
           done
+          echo "Output safe_to_merge: $safe_to_merge"
+          echo "safe_to_merge=$safe_to_merge" >> $GITHUB_OUTPUT
     
       - name: Approve and merge if they are safe to merge
         id: approve-merge
