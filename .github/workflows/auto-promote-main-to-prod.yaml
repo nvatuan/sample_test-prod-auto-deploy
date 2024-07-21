@@ -107,15 +107,11 @@ jobs:
             This PR contains unsafe changes. Please review the changes and approve the merge manually.
             Found unsafe changes:
             ```
-            test 123
+            * $unsafe_changes
             ```
-
-      - name: Status Check auto merge
-        id: status-check
-        env:
-          safe_to_merge: ${{ steps.detect-safe-changes.outputs.safe_to_merge }}
+      
+      - name: Add reviewers if need approval
+        id: assign-if-need-approval
+        if: steps.detect-safe-changes.outputs.safe_to_merge == 'false'
         run: |
-          if [[ $safe_to_merge == true ]]; then 
-            exit 0
-          fi
-          exit 1
+          gh pr edit ${{ github.event.number }} --add-reviewer ${{ github.actor }}
