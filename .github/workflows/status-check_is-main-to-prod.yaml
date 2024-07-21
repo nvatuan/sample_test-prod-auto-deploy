@@ -12,6 +12,10 @@ on:
 permissions:
   pull-requests: write
 
+concurrency:
+  group: auto-promote
+  cancel-in-progress: true
+
 jobs:
   stschk_merge-from-main-to-prod:
     runs-on: ubuntu-latest
@@ -79,6 +83,8 @@ jobs:
     
       - name: Approve and merge if they are safe to merge
         id: approve-merge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [[ "${{ steps.detect-safe-changes.outputs.safe_to_merge }}" == "true" ]]; then
             echo "OK: Safe to merge"
