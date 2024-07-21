@@ -24,10 +24,10 @@ jobs:
           git pull
           git reset --hard origin/main
 
-          set -e
+          set +e
           gh pr create --base prod --head main --title "AUTO PR: Promote 'main' to 'prod'" --label auto-promote --fill > stdout.txt 2> stderr.txt
           errcode=$?
-          set +e
+          set -e
 
           if [ -s pr-url.txt ]; then
             echo "PR created:"
