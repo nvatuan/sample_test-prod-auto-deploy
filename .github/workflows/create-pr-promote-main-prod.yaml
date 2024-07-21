@@ -21,8 +21,7 @@ jobs:
           git checkout main
           git fetch origin main
           git pull
-          # gh pr create --base prod --head main --title "AUTO PR: Promote 'main' to 'prod'" --fill > stdout.txt 2> stderr.txt
-          gh pr create --base prod --head main --title "AUTO PR: Promote 'main' to 'prod'" --fill
+          gh pr create --base prod --head main --title "AUTO PR: Promote 'main' to 'prod'" --fill > stdout.txt 2> stderr.txt || true
           if [ -s stderr.txt ]; then
             echo "PR already exists:"
             cat stderr.txt | tail -n 1
