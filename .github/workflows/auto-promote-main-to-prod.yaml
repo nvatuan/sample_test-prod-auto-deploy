@@ -105,7 +105,7 @@ jobs:
             This PR contains unsafe changes. Please review the changes and approve the merge manually.
             Found unsafe changes:
             ```
-            * ${{ steps.detect-safe-changes.outputs.unsafe_changes }}
+            ${{ steps.detect-safe-changes.outputs.unsafe_changes }}
             ```
       
       - name: Add reviewers if need approval
@@ -114,4 +114,4 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.github_token }}
         run: |
-          gh pr edit ${{ github.event.number }} --add-reviewer @nvatuan
+          gh pr edit ${{ github.event.number }} --add-reviewer nvatuan
